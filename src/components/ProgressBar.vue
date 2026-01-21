@@ -58,7 +58,7 @@ const percentage = computed(() => {
   .current-credits {
     margin-left: 30px;
     text-transform: uppercase;
-    color: white;
+    color: #c4edc4;
   }
 }
 
@@ -73,5 +73,6 @@ const percentage = computed(() => {
   transform: translate(-50%, -50%);
   white-space: nowrap;
   text-transform: uppercase;
+  color: #464646;
 }
 </style>
