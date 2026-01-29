@@ -267,7 +267,7 @@ const graduationBlock = computed(() =>
 )
 
 const getRegistrationData = async () => {
-  const res = await fetch('/hust-master-tracker/public/data.json');
+  const res = await fetch(`${import.meta.env.BASE_URL}data.json`)
   hustRegistrationData.value = await res.json();
 }
 
