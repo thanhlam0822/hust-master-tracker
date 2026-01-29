@@ -17,7 +17,7 @@
           <p class="common-title">Khối kiến thức chung (3 TC)</p>
           <div class="course-list grid-cols-2">
             <course-item
-                v-for="course in generalKnowledgeBlock"
+                v-for="course in generalBlock"
                 :key="course.id"
                 :code="course.code"
                 :name="course.name"
@@ -31,7 +31,7 @@
           <p class="common-title">Khối kiến thức ngành rộng ({{ broadDisciplinaryKnowledgeCredits }} TC)</p>
           <div class="course-list grid-cols-2">
             <course-item
-                v-for="course in broadDisciplinaryKnowledgeBlock"
+                v-for="course in broadBlock"
                 :key="course.id"
                 :code="course.code"
                 :name="course.name"
@@ -47,7 +47,7 @@
           <p class="common-title">Khối kiến thức chuyên ngành nâng cao ({{ advancedSpecializedKnowledgeCredits }}TC)</p>
           <div class="course-list">
             <course-item
-                v-for="course in advancedSpecializedKnowledgeBlock"
+                v-for="course in advancedBlock"
                 :key="course.id"
                 :code="course.code"
                 :name="course.name"
@@ -68,7 +68,7 @@
             </div>
             <div class="course-list no-margin-top grid-cols-3">
               <course-item
-                  v-for="course in applicationOrientedModuleBlock.optionA"
+                  v-for="course in applicationBlock.optionA"
                   :key="course.id"
                   :code="course.code"
                   :name="course.name"
@@ -103,7 +103,7 @@
           <p class="common-title">Thực tập và luận văn tốt nghiệp ({{ graduateSubjectCredits }} TC)</p>
           <div class="course-list grid-cols-3">
             <course-item
-                v-for="course in graduationInternshipAndGraduationThesis"
+                v-for="course in graduationBlock"
                 :key="course.id"
                 :code="course.code"
                 :name="course.name"
@@ -118,40 +118,42 @@
   </div>
 </template>
 <script setup lang="ts">
-import {ref, computed} from "vue";
+import {ref, computed, onMounted} from "vue";
 import Card from "../components/Card.vue";
 import ProgressBar from "../components/ProgressBar.vue";
 import CourseItem from "../components/CourseItem.vue";
 
+const hustRegistrationData = ref();
+
 const generalKnowledgeBlock = ref([
-  {id: 1, code: 'SS6013', name: 'Triết học', credit: 3, icon: 'shield_check', done: true},
+  {id: 1, code: 'SS6013', name: 'Triết học', credit: 3, icon: 'shield_check'},
 ])
 
 const broadDisciplinaryKnowledgeBlock = ref([
   {id: 2, code: 'IT6460', name: 'Quản trị dự án CNTT và quản lý thay đổi', credit: 2, icon: 'briefcase'},
   {id: 3, code: 'IT4818', name: 'Phân tích nghiệp vụ thông minh', credit: 2, icon: 'network'},
   {id: 4, code: 'IT6820', name: 'Kiến trúc máy tính tiên tiến', credit: 2, icon: 'cpu'},
-  {id: 5, code: 'IT6819', name: 'Kiến trúc phần mềm', credit: 2, icon: 'codesandbox', done: true},
-  {id: 6, code: 'IT6340', name: 'Các hệ thống thông minh', credit: 2, icon: 'brain', done: true},
+  {id: 5, code: 'IT6819', name: 'Kiến trúc phần mềm', credit: 2, icon: 'codesandbox'},
+  {id: 6, code: 'IT6340', name: 'Các hệ thống thông minh', credit: 2, icon: 'brain'},
   {id: 7, code: 'IT5440', name: 'Nguyên lý và kỹ thuật phân tích chương trình', credit: 2, icon: 'document'}
 ])
 
 const advancedSpecializedKnowledgeBlock = ref([
-  {id: 8, code: 'IT4922', name: 'Mạng thế hệ sau', credit: 2, icon: 'network', done: true},
-  {id: 9, code: 'IT4527', name: 'Blockchain và ứng dụng', credit: 2, icon: 'coin', done: true},
+  {id: 8, code: 'IT4922', name: 'Mạng thế hệ sau', credit: 2, icon: 'network'},
+  {id: 9, code: 'IT4527', name: 'Blockchain và ứng dụng', credit: 2, icon: 'coin'},
   {id: 10, code: 'IT4772', name: 'Xử lý ngôn ngữ tự nhiên', credit: 3, icon: 'brain'},
   {id: 11, code: 'IT5419', name: 'Tích hợp hệ thống thông tin', credit: 3, icon: 'network'},
   {id: 12, code: 'IT6390', name: 'Web ngữ nghĩa', credit: 3, icon: 'globe'},
   {id: 13, code: 'IT4235', name: 'Thị giác máy tính', credit: 2, icon: 'scan_eye'},
-  {id: 14, code: 'IT5550', name: 'Các giải pháp và chính sách an ninh mạng', credit: 3, icon: 'graduate', done: true}
+  {id: 14, code: 'IT5550', name: 'Các giải pháp và chính sách an ninh mạng', credit: 3, icon: 'graduate'}
 ])
 
 const applicationOrientedModuleBlock = ref({
   optionA: [
     {id: 15, code: 'IT6575', name: 'Nguyên lý và mô thức phát triển hệ phân tán', credit: 2, icon: 'book'},
-    {id: 16, code: 'IT5404', name: 'Điện toán đám mây', credit: 3, icon: 'cloud', done: true},
-    {id: 17, code: 'IT6490', name: 'Các phương pháp Agile', credit: 2, icon: 'square_chart_gantt', done: true},
-    {id: 18, code: 'IT6818', name: 'Mô hình hóa và phân tích phần mềm', credit: 3, icon: 'folder_code', done: true},
+    {id: 16, code: 'IT5404', name: 'Điện toán đám mây', credit: 3, icon: 'cloud'},
+    {id: 17, code: 'IT6490', name: 'Các phương pháp Agile', credit: 2, icon: 'square_chart_gantt'},
+    {id: 18, code: 'IT6818', name: 'Mô hình hóa và phân tích phần mềm', credit: 3, icon: 'folder_code'},
     {id: 19, code: 'IT6072', name: 'An toàn hệ thống thông tin', credit: 2, icon: 'shield_plus'},
   ],
   optionB: [
@@ -164,33 +166,40 @@ const applicationOrientedModuleBlock = ref({
 })
 
 const graduationInternshipAndGraduationThesis = ref([
-  {id: 25, code: 'TT6000', name: 'Thực tập tốt nghiệp thạc sĩ', credit: 6, icon: 'briefcase', done: true},
+  {id: 25, code: 'TT6000', name: 'Thực tập tốt nghiệp thạc sĩ', credit: 6, icon: 'briefcase'},
   {id: 26, code: 'LV6002', name: 'Luận văn tốt nghiệp thạc sĩ', credit: 9, icon: 'scroll_text'},
 ])
 
+const generalKnowledgeCredits = computed(() =>
+    generalBlock.value.reduce(
+        (sum, c) => sum + c.credit,
+        0
+    )
+)
+
 const broadDisciplinaryKnowledgeCredits = computed(() =>
-    broadDisciplinaryKnowledgeBlock.value.reduce(
+    broadBlock.value.reduce(
         (sum, c) => sum + c.credit,
         0
     )
 )
 
 const advancedSpecializedKnowledgeCredits = computed(() =>
-    advancedSpecializedKnowledgeBlock.value.reduce(
+    advancedBlock.value.reduce(
         (sum, c) => sum + c.credit,
         0
     )
 )
 
 const applicationOrientedModuleCredits = computed(() =>
-    applicationOrientedModuleBlock.value.optionA.reduce(
+    applicationBlock.value.optionA.reduce(
         (sum, c) => sum + c.credit,
         0
     )
 )
 
 const graduateSubjectCredits = computed(() =>
-    graduationInternshipAndGraduationThesis.value.reduce(
+    graduationBlock.value.reduce(
         (sum, c) => sum + c.credit,
         0
     )
@@ -201,7 +210,7 @@ const totalCredit = computed(() =>
     + advancedSpecializedKnowledgeCredits.value
     + applicationOrientedModuleCredits.value
     + graduateSubjectCredits.value
-    + 3
+    + generalKnowledgeCredits.value
 )
 
 const countDone = (courses = []) =>
@@ -211,15 +220,58 @@ const countDone = (courses = []) =>
 
 const currentCredit = computed(() => {
   return (
-      countDone(generalKnowledgeBlock.value) +
-      countDone(broadDisciplinaryKnowledgeBlock.value) +
-      countDone(advancedSpecializedKnowledgeBlock.value) +
+      countDone(generalBlock.value) +
+      countDone(broadBlock.value) +
+      countDone(advancedBlock.value) +
       countDone(
-          applicationOrientedModuleBlock.value.optionA
+          applicationBlock.value.optionA
       ) +
-      countDone(graduationInternshipAndGraduationThesis.value)
+      countDone(graduationBlock.value)
   )
 })
+
+const completedCodes = computed(() => {
+  return new Set(
+      hustRegistrationData.value
+          ?.filter(i => i.code)
+          ?.map(i => i.code)
+  )
+})
+
+const markDone = (list, completedSet) => {
+  return list.map(item => ({
+    ...item,
+    done: completedSet?.has(item.code)
+  }))
+}
+
+const generalBlock = computed(() =>
+    markDone(generalKnowledgeBlock.value, completedCodes.value)
+)
+
+const broadBlock = computed(() =>
+    markDone(broadDisciplinaryKnowledgeBlock.value, completedCodes.value)
+)
+
+const advancedBlock = computed(() =>
+    markDone(advancedSpecializedKnowledgeBlock.value, completedCodes.value)
+)
+
+const applicationBlock = computed(() => ({
+  optionA: markDone(applicationOrientedModuleBlock.value.optionA, completedCodes.value),
+  optionB: markDone(applicationOrientedModuleBlock.value.optionB, completedCodes.value)
+}))
+
+const graduationBlock = computed(() =>
+    markDone(graduationInternshipAndGraduationThesis.value, completedCodes.value)
+)
+
+const getRegistrationData = async () => {
+  const res = await fetch('/hust-master-tracker/public/data.json');
+  hustRegistrationData.value = await res.json();
+}
+
+onMounted(getRegistrationData)
 </script>
 <style scoped lang="scss">
 .container {
