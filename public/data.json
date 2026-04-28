@@ -91,6 +91,27 @@
     "date":"17\/01\/2026 09:57:15"
   },
   {
+    "code":"IT6072",
+    "name":"An toàn hệ thống thông tin",
+    "credits":"2",
+    "semester":"2025_2026_2",
+    "date":"11\/04\/2026 21:58:25"
+  },
+  {
+    "code":"IT6575",
+    "name":"Nguyên lý và mô thức phát triển hệ phân tán",
+    "credits":"2",
+    "semester":"2025_2026_2",
+    "date":"15\/04\/2026 10:16:27"
+  },
+  {
+    "code":"IT4235",
+    "name":"Thị giác máy tính",
+    "credits":"2",
+    "semester":"2025_2026_2",
+    "date":"20\/04\/2026 10:15:32"
+  },
+  {
     "code":"",
     "name":"",
     "credits":"",
