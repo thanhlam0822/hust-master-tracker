@@ -112,6 +112,27 @@
     "date":"20\/04\/2026 10:15:32"
   },
   {
+    "code":"IT6820",
+    "name":"Kiến trúc máy tính tiên tiến",
+    "credits":"2",
+    "semester":"2026_2027_1",
+    "date":"08\/07\/2026 06:29:07"
+  },
+  {
+    "code":"IT6460",
+    "name":"Quản trị dự án CNTT và quản lý thay đổi",
+    "credits":"2",
+    "semester":"2026_2027_1",
+    "date":"08\/07\/2026 06:29:25"
+  },
+  {
+    "code":"IT5419",
+    "name":"Tích hợp hệ thống thông tin",
+    "credits":"3",
+    "semester":"2026_2027_1",
+    "date":"08\/07\/2026 06:34:55"
+  },
+  {
     "code":"",
     "name":"",
     "credits":"",
