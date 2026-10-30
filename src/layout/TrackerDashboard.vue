@@ -43,9 +43,9 @@
             />
           </div>
           <button class="btn-calculate" @click="calculatePlan">TÍNH TOÁN KẾ HOẠCH</button>
+          <button class="btn-calculate btn-secondary" @click="resetAssumed">XÓA ĐIỂM GIẢ ĐỊNH</button>
           <div v-if="planMessage" class="plan-message">{{ planMessage }}</div>
         </div>
-
 
         <div class="card stat-card table-card-compact">
           <div class="card-title px-10">BẢNG ĐIỂM CẦN ĐẠT</div>
@@ -88,7 +88,13 @@
                 <td>{{ course.name }}</td>
                 <td>{{ course.credit }}</td>
                 <td>{{ mapSubject?.get(course.code)?.final_score }}</td>
-                <td class="font-bold">{{ mapSubject?.get(course.code)?.letter_score }}</td>
+                <td class="font-bold">
+                  <span v-if="isPassed(course.code)">{{ mapSubject.get(course.code).letter_score }}</span>
+                  <select v-else v-model="assumedGrades[course.code]" class="assume-select">
+                    <option value="">{{ mapSubject.get(course.code)?.letter_score || '--' }}</option>
+                    <option v-for="g in ASSUMABLE_GRADES" :key="g" :value="g">{{ g }}</option>
+                  </select>
+                </td>
               </tr>
               </tbody>
             </table>
@@ -112,7 +118,13 @@
                 <td>{{ course.name }}</td>
                 <td>{{ course.credit }}</td>
                 <td>{{ mapSubject?.get(course.code)?.final_score }}</td>
-                <td class="font-bold">{{ mapSubject?.get(course.code)?.letter_score }}</td>
+                <td class="font-bold">
+                  <span v-if="isPassed(course.code)">{{ mapSubject.get(course.code).letter_score }}</span>
+                  <select v-else v-model="assumedGrades[course.code]" class="assume-select">
+                    <option value="">{{ mapSubject.get(course.code)?.letter_score || '--' }}</option>
+                    <option v-for="g in ASSUMABLE_GRADES" :key="g" :value="g">{{ g }}</option>
+                  </select>
+                </td>
               </tr>
               </tbody>
             </table>
@@ -138,7 +150,13 @@
                 <td>{{ course.name }}</td>
                 <td>{{ course.credit }}</td>
                 <td>{{ mapSubject?.get(course.code)?.final_score }}</td>
-                <td class="font-bold">{{ mapSubject?.get(course.code)?.letter_score }}</td>
+                <td class="font-bold">
+                  <span v-if="isPassed(course.code)">{{ mapSubject.get(course.code).letter_score }}</span>
+                  <select v-else v-model="assumedGrades[course.code]" class="assume-select">
+                    <option value="">{{ mapSubject.get(course.code)?.letter_score || '--' }}</option>
+                    <option v-for="g in ASSUMABLE_GRADES" :key="g" :value="g">{{ g }}</option>
+                  </select>
+                </td>
               </tr>
               </tbody>
             </table>
@@ -182,7 +200,13 @@
                 <td>{{ course.name }}</td>
                 <td>{{ course.credit }}</td>
                 <td>{{ mapSubject?.get(course.code)?.final_score }}</td>
-                <td class="font-bold">{{ mapSubject?.get(course.code)?.letter_score }}</td>
+                <td class="font-bold">
+                  <span v-if="isPassed(course.code)">{{ mapSubject.get(course.code).letter_score }}</span>
+                  <select v-else v-model="assumedGrades[course.code]" class="assume-select">
+                    <option value="">{{ mapSubject.get(course.code)?.letter_score || '--' }}</option>
+                    <option v-for="g in ASSUMABLE_GRADES" :key="g" :value="g">{{ g }}</option>
+                  </select>
+                </td>
               </tr>
               </tbody>
             </table>
@@ -205,8 +229,14 @@
                 <td class="font-medium">{{ course.code }}</td>
                 <td>{{ course.name }}</td>
                 <td>{{ course.credit }}</td>
-                <td>{{ course.score }}</td>
-                <td class="font-bold">{{ course.grade }}</td>
+                <td>{{ mapSubject?.get(course.code)?.final_score }}</td>
+                <td class="font-bold">
+                  <span v-if="isPassed(course.code)">{{ mapSubject.get(course.code).letter_score }}</span>
+                  <select v-else v-model="assumedGrades[course.code]" class="assume-select">
+                    <option value="">{{ mapSubject.get(course.code)?.letter_score || '--' }}</option>
+                    <option v-for="g in ASSUMABLE_GRADES" :key="g" :value="g">{{ g }}</option>
+                  </select>
+                </td>
               </tr>
               </tbody>
             </table>
@@ -235,18 +265,16 @@ const LETTER_SCALE = [
   {letter: 'A', point: 4.0, min: 8.5},
 ]
 const PASSED_GRADES = ['A+', 'A', 'B+', 'B', 'C+', 'C']
+const ASSUMABLE_GRADES = ['C', 'C+', 'B', 'B+', 'A', 'A+']
 
 const hustRegistrationData = ref<any[]>([])
 const currentTab = ref<'A' | 'B'>('A')
 const targetCPA = ref('')
 const targetScores = ref<{ code: string; credit: number; target: string }[]>([])
 const planMessage = ref('')
+const assumedGrades = ref<Record<string, string>>({})
 
 const mapSubject = ref(new Map())
-
-const progressPercentage = computed(() => {
-  return Math.round((currentCredit.value / totalCredit.value) * 100)
-})
 
 const generalBlock = ref([
   {id: 1, code: 'SS6013', name: 'Triết học', credit: 3, icon: 'shield_check'},
@@ -264,9 +292,9 @@ const broadBlock = ref([
 const advancedBlock = ref([
   {id: 8, code: 'IT4922', name: 'Mạng thế hệ sau', credit: 2, icon: 'network'},
   {id: 9, code: 'IT4527', name: 'Blockchain và ứng dụng', credit: 2, icon: 'coin'},
-  {id: 10, code: 'IT4772', name: 'Xử lý ngôn ngữ tự nhiên', credit: 3, icon: 'brain'},
+  {id: 10, code: 'IT4772', name: 'Xử lý ngôn ngữ tự nhiên', credit: 3, icon: 'brain'},
   {id: 11, code: 'IT5419', name: 'Tích hợp hệ thống thông tin', credit: 3, icon: 'network'},
-  {id: 12, code: 'IT6390', name: 'Web ngữ nghĩa', credit: 3, icon: 'globe'},
+  {id: 12, code: 'IT6390', name: 'Web ngữ nghĩa', credit: 3, icon: 'globe'},
   {id: 13, code: 'IT4235', name: 'Thị giác máy tính', credit: 2, icon: 'scan_eye'},
   {id: 14, code: 'IT5550', name: 'Các giải pháp và chính sách an ninh mạng', credit: 3, icon: 'graduate'}
 ])
@@ -283,8 +311,8 @@ const applicationBlock = ref({
     {id: 20, code: 'IT6575', name: 'Nguyên lý và mô thức phát triển hệ phân tán', credit: 2, icon: 'book'},
     {id: 21, code: 'IT5408', name: 'Tính toán hiệu năng cao', credit: 2, icon: 'chart_no_axes_combined'},
     {id: 22, code: 'IT5404', name: 'Điện toán đám mây', credit: 3, icon: 'cloud'},
-    {id: 23, code: 'IT5420', name: 'Tích hợp dữ liệu', credit: 3, icon: 'database'},
-    {id: 24, code: 'IT5429', name: 'Phân tích đồ thị với dữ liệu lớn', credit: 2, icon: 'chart_spline'},
+    {id: 23, code: 'IT5420', name: 'Tích hợp dữ liệu', credit: 3, icon: 'database'},
+    {id: 24, code: 'IT5429', name: 'Phân tích đồ thị với dữ liệu lớn', credit: 2, icon: 'chart_spline'},
   ]
 })
 
@@ -305,11 +333,29 @@ const totalCredit = computed(() =>
     allCourses.value.reduce((sum, c) => sum + c.credit, 0)
 )
 
+const isPassed = (code: string) =>
+    PASSED_GRADES.includes(mapSubject.value.get(code)?.letter_score ?? '')
+
+const planLetter = (code: string): string =>
+    isPassed(code) ? mapSubject.value.get(code).letter_score : (assumedGrades.value[code] ?? '')
+
 const gradedStats = computed(() => {
   let totalPoint = 0
   let totalCredits = 0
   for (const c of allCourses.value) {
-    const letter = mapSubject.value.get(c.code)?.letter_score
+    const letter = mapSubject.value.get(c.code)?.letter_score ?? ''
+    if (!PASSED_GRADES.includes(letter)) continue
+    totalPoint += GRADE_POINT[letter] * c.credit
+    totalCredits += c.credit
+  }
+  return {totalPoint, totalCredits}
+})
+
+const planStats = computed(() => {
+  let totalPoint = 0
+  let totalCredits = 0
+  for (const c of allCourses.value) {
+    const letter = planLetter(c.code)
     if (!PASSED_GRADES.includes(letter)) continue
     totalPoint += GRADE_POINT[letter] * c.credit
     totalCredits += c.credit
@@ -319,16 +365,24 @@ const gradedStats = computed(() => {
 
 const currentCredit = computed(() => gradedStats.value.totalCredits)
 
+const progressPercentage = computed(() =>
+    totalCredit.value ? Math.round((currentCredit.value / totalCredit.value) * 100) : 0
+)
+
 const cpaValue = computed(() => {
   const {totalPoint, totalCredits} = gradedStats.value
   return totalCredits ? totalPoint / totalCredits : 0
 })
 
-const currentCPA = computed(() => cpaValue.value.toFixed(2))
+const currentCPA = computed(() => (Math.round(cpaValue.value * 100 + 1e-9) / 100).toFixed(2))
 
 const remainingCourses = computed(() =>
-    allCourses.value.filter(c => !PASSED_GRADES.includes(mapSubject.value.get(c.code)?.letter_score))
+    allCourses.value.filter(c => !PASSED_GRADES.includes(planLetter(c.code)))
 )
+
+const resetAssumed = () => {
+  assumedGrades.value = {}
+}
 
 const calculatePlan = () => {
   targetScores.value = []
@@ -340,18 +394,19 @@ const calculatePlan = () => {
     return
   }
 
-  const {totalPoint, totalCredits} = gradedStats.value
+  const {totalPoint, totalCredits} = planStats.value
   const remaining = remainingCourses.value
   const remainCredits = remaining.reduce((s, c) => s + c.credit, 0)
   if (!remainCredits) {
-    planMessage.value = 'Không còn môn nào cần học'
+    const finalCPA = totalCredits ? totalPoint / totalCredits : 0
+    planMessage.value = `Không còn môn nào cần học. CPA dự kiến: ${(Math.round(finalCPA * 100 + 1e-9) / 100).toFixed(2)}`
     return
   }
 
   const allCredits = totalCredits + remainCredits
   const maxCPA = (totalPoint + 4 * remainCredits) / allCredits
   if (target > maxCPA + 1e-9) {
-    planMessage.value = `Không khả thi. CPA tối đa có thể đạt: ${maxCPA.toFixed(2)}`
+    planMessage.value = `Không khả thi. CPA tối đa có thể đạt: ${(Math.floor(maxCPA * 100 + 1e-9) / 100).toFixed(2)}`
     return
   }
 
@@ -381,7 +436,7 @@ const calculatePlan = () => {
   }))
 
   const achieved = (totalPoint + sum) / allCredits
-  planMessage.value = `CPA đạt được theo kế hoạch: ${achieved.toFixed(2)} (tối đa: ${maxCPA.toFixed(2)})`
+  planMessage.value = `CPA đạt được theo kế hoạch: ${(Math.round(achieved * 100 + 1e-9) / 100).toFixed(2)} (tối đa: ${(Math.floor(maxCPA * 100 + 1e-9) / 100).toFixed(2)})`
 }
 
 const getRegistrationData = async () => {
@@ -566,6 +621,17 @@ onMounted(getRegistrationData)
   background-color: #630a0d;
 }
 
+.btn-secondary {
+  background: #fff;
+  color: #7b0e11;
+  border: 1px solid #7b0e11;
+  margin-top: 6px;
+}
+
+.btn-secondary:hover {
+  background: #f8e9ea;
+}
+
 .main-columns-grid {
   display: grid;
   grid-template-columns: 1.1fr 1fr 1.3fr;
@@ -662,6 +728,14 @@ onMounted(getRegistrationData)
   margin-top: 6px;
   font-size: 0.75rem;
   color: #7b0e11;
+}
+
+.assume-select {
+  font-size: 0.72rem;
+  padding: 2px 4px;
+  border: 1px dashed #7b0e11;
+  border-radius: 4px;
+  background: #fff;
 }
 
 @media (max-width: 1100px) {
