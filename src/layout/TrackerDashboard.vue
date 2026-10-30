@@ -3,7 +3,7 @@
     <header class="hust-header">
       <div class="header-left">
         <div>
-          <img src="../assets/logo_hust.webp" alt="HUST Logo" width="55" height="65"/>
+          <img src="../assets/logo_hust.webp" alt="HUST Logo" class="hust-logo"/>
         </div>
         <h1 class="header-title">HỆ THỐNG QUẢN LÝ VÀ THEO DÕI TIẾN ĐỘ HỌC TẬP - THẠC SĨ CNTT (HUST)</h1>
       </div>
@@ -28,7 +28,7 @@
         <div class="card stat-card">
           <div class="card-title">ĐIỂM TRUNG BÌNH HỆ 4</div>
           <div class="stat-main">
-            <div class="stat-number text-large">{{ currentCPA.toFixed(2) }}</div>
+            <div class="stat-number text-large">{{ currentCPA }}</div>
           </div>
         </div>
 
@@ -42,7 +42,8 @@
                 class="custom-input"
             />
           </div>
-          <button class="btn-calculate">TÍNH TOÁN KẾ HOẠCH</button>
+          <button class="btn-calculate" @click="calculatePlan">TÍNH TOÁN KẾ HOẠCH</button>
+          <div v-if="planMessage" class="plan-message">{{ planMessage }}</div>
         </div>
 
 
@@ -52,14 +53,14 @@
             <thead>
             <tr>
               <th style="width: 35%;">Mã Môn</th>
-              <th style="width: 35%;">Tín chỉ</th>
+              <th style="width: 35%;">Số tín chỉ</th>
               <th style="width: 30%;" class="text-right">Điểm Chữ</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="item in targetScores" :key="item.code">
               <td>{{ item.code }}</td>
-              <td>{{ item.credit }} TTC</td>
+              <td>{{ item.credit }}</td>
               <td class="text-right font-medium">{{ item.target }}</td>
             </tr>
             </tbody>
@@ -76,8 +77,8 @@
               <tr>
                 <th style="width: 22%;">Mã Môn</th>
                 <th>Tên Môn Học</th>
-                <th style="width: 18%;">Tín Chỉ (TC)</th>
-                <th style="width: 18%;">Điểm Số (ĐTB)</th>
+                <th style="width: 18%;">Số tín chỉ</th>
+                <th style="width: 18%;">Điểm KTHP</th>
                 <th style="width: 15%;">Điểm Chữ</th>
               </tr>
               </thead>
@@ -85,9 +86,9 @@
               <tr v-for="course in generalBlock" :key="course.id">
                 <td class="font-medium">{{ course.code }}</td>
                 <td>{{ course.name }}</td>
-                <td>{{ course.credit }} TC</td>
-                <td>{{ course.score !== undefined ? course.score.toFixed(1) : '-' }}</td>
-                <td class="font-bold">{{ course.grade || '-' }}</td>
+                <td>{{ course.credit }}</td>
+                <td>{{ mapSubject?.get(course.code)?.final_score }}</td>
+                <td class="font-bold">{{ mapSubject?.get(course.code)?.letter_score }}</td>
               </tr>
               </tbody>
             </table>
@@ -100,8 +101,8 @@
               <tr>
                 <th style="width: 22%;">Mã Môn</th>
                 <th>Tên Môn Học</th>
-                <th style="width: 18%;">Tín Chỉ</th>
-                <th style="width: 18%;">Điểm (ĐTB)</th>
+                <th style="width: 18%;">Số tín chỉ</th>
+                <th style="width: 18%;">Điểm KTHP</th>
                 <th style="width: 15%;">Điểm Chữ</th>
               </tr>
               </thead>
@@ -109,9 +110,9 @@
               <tr v-for="course in broadBlock" :key="course.id">
                 <td class="font-medium">{{ course.code }}</td>
                 <td>{{ course.name }}</td>
-                <td>{{ course.credit }} TC</td>
-                <td>{{ course.score !== undefined ? course.score.toFixed(1) : '-' }}</td>
-                <td class="font-bold">{{ course.grade || '-' }}</td>
+                <td>{{ course.credit }}</td>
+                <td>{{ mapSubject?.get(course.code)?.final_score }}</td>
+                <td class="font-bold">{{ mapSubject?.get(course.code)?.letter_score }}</td>
               </tr>
               </tbody>
             </table>
@@ -126,7 +127,8 @@
               <tr>
                 <th style="width: 22%;">Mã Môn</th>
                 <th>Tên Môn Học</th>
-                <th style="width: 20%;">Điểm Số (ĐTB)</th>
+                <th>Số tín chỉ</th>
+                <th style="width: 20%;">Điểm KTHP</th>
                 <th style="width: 18%;">Điểm Chữ</th>
               </tr>
               </thead>
@@ -134,8 +136,9 @@
               <tr v-for="course in advancedBlock" :key="course.id">
                 <td class="font-medium">{{ course.code }}</td>
                 <td>{{ course.name }}</td>
-                <td>{{ course.score !== undefined ? course.score.toFixed(1) : '-' }}</td>
-                <td class="font-bold">{{ course.grade || '-' }}</td>
+                <td>{{ course.credit }}</td>
+                <td>{{ mapSubject?.get(course.code)?.final_score }}</td>
+                <td class="font-bold">{{ mapSubject?.get(course.code)?.letter_score }}</td>
               </tr>
               </tbody>
             </table>
@@ -167,8 +170,8 @@
               <tr>
                 <th style="width: 20%;">Mã Môn</th>
                 <th>Tên Môn Học</th>
-                <th style="width: 18%;">Tín Chỉ</th>
-                <th style="width: 18%;">Điểm Số (ĐTB)</th>
+                <th style="width: 18%;">Số tín chỉ</th>
+                <th style="width: 18%;">Điểm KTHP</th>
                 <th style="width: 15%;">Điểm Chữ</th>
               </tr>
               </thead>
@@ -177,9 +180,9 @@
                   :key="course.id">
                 <td class="font-medium">{{ course.code }}</td>
                 <td>{{ course.name }}</td>
-                <td>{{ course.credit }} TC</td>
-                <td>{{ course.score !== undefined ? course.score.toFixed(1) : '-' }}</td>
-                <td class="font-bold">{{ course.grade || '-' }}</td>
+                <td>{{ course.credit }}</td>
+                <td>{{ mapSubject?.get(course.code)?.final_score }}</td>
+                <td class="font-bold">{{ mapSubject?.get(course.code)?.letter_score }}</td>
               </tr>
               </tbody>
             </table>
@@ -192,8 +195,8 @@
               <tr>
                 <th style="width: 20%;">Mã Môn</th>
                 <th>Tên Môn Học</th>
-                <th style="width: 18%;">Tín Chỉ</th>
-                <th style="width: 18%;">Điểm (ĐTB)</th>
+                <th style="width: 18%;">Số tín chỉ</th>
+                <th style="width: 18%;">Điểm KTHP</th>
                 <th style="width: 15%;">Điểm Chữ</th>
               </tr>
               </thead>
@@ -201,9 +204,9 @@
               <tr v-for="course in graduationBlock" :key="course.id">
                 <td class="font-medium">{{ course.code }}</td>
                 <td>{{ course.name }}</td>
-                <td>{{ course.credit }} TC</td>
-                <td>{{ course.score !== undefined ? course.score.toFixed(1) : '-' }}</td>
-                <td class="font-bold">{{ course.grade || '-' }}</td>
+                <td>{{ course.credit }}</td>
+                <td>{{ course.score }}</td>
+                <td class="font-bold">{{ course.grade }}</td>
               </tr>
               </tbody>
             </table>
@@ -215,24 +218,35 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, onMounted} from 'vue'
+import {computed, onMounted, ref} from 'vue'
+
+const GRADE_POINT: Record<string, number> = {
+  'A+': 4.0, 'A': 4.0,
+  'B+': 3.5, 'B': 3.0,
+  'C+': 2.5, 'C': 2.0,
+  'D+': 1.5, 'D': 1.0,
+  'F': 0,
+}
+const LETTER_SCALE = [
+  {letter: 'C', point: 2.0, min: 5.5},
+  {letter: 'C+', point: 2.5, min: 6.5},
+  {letter: 'B', point: 3.0, min: 7.0},
+  {letter: 'B+', point: 3.5, min: 8.0},
+  {letter: 'A', point: 4.0, min: 8.5},
+]
+const PASSED_GRADES = ['A+', 'A', 'B+', 'B', 'C+', 'C']
 
 const hustRegistrationData = ref<any[]>([])
 const currentTab = ref<'A' | 'B'>('A')
 const targetCPA = ref('')
-const currentCPA = ref(3.25)
-const totalCredit = ref(60)
-const currentCredit = ref(49)
+const targetScores = ref<{ code: string; credit: number; target: string }[]>([])
+const planMessage = ref('')
+
+const mapSubject = ref(new Map())
 
 const progressPercentage = computed(() => {
   return Math.round((currentCredit.value / totalCredit.value) * 100)
 })
-
-const targetScores = ref([
-  {code: 'IT5440', credit: 2, target: '7.0/10'},
-  {code: 'IT5400', credit: 2, target: '7.0/10'},
-  {code: 'LV6002', credit: 2, target: '8.5/10'}
-])
 
 const generalBlock = ref([
   {id: 1, code: 'SS6013', name: 'Triết học', credit: 3, icon: 'shield_check'},
@@ -279,14 +293,101 @@ const graduationBlock = ref([
   {id: 26, code: 'LV6002', name: 'Luận văn tốt nghiệp thạc sĩ', credit: 9, icon: 'scroll_text'},
 ])
 
+const allCourses = computed(() => [
+  ...generalBlock.value,
+  ...broadBlock.value,
+  ...advancedBlock.value,
+  ...(currentTab.value === 'A' ? applicationBlock.value.optionA : applicationBlock.value.optionB),
+  ...graduationBlock.value,
+])
+
+const totalCredit = computed(() =>
+    allCourses.value.reduce((sum, c) => sum + c.credit, 0)
+)
+
+const gradedStats = computed(() => {
+  let totalPoint = 0
+  let totalCredits = 0
+  for (const c of allCourses.value) {
+    const letter = mapSubject.value.get(c.code)?.letter_score
+    if (!PASSED_GRADES.includes(letter)) continue
+    totalPoint += GRADE_POINT[letter] * c.credit
+    totalCredits += c.credit
+  }
+  return {totalPoint, totalCredits}
+})
+
+const currentCredit = computed(() => gradedStats.value.totalCredits)
+
+const cpaValue = computed(() => {
+  const {totalPoint, totalCredits} = gradedStats.value
+  return totalCredits ? totalPoint / totalCredits : 0
+})
+
+const currentCPA = computed(() => cpaValue.value.toFixed(2))
+
+const remainingCourses = computed(() =>
+    allCourses.value.filter(c => !PASSED_GRADES.includes(mapSubject.value.get(c.code)?.letter_score))
+)
+
+const calculatePlan = () => {
+  targetScores.value = []
+  planMessage.value = ''
+
+  const target = parseFloat(String(targetCPA.value).replace(',', '.'))
+  if (isNaN(target) || target < 0 || target > 4) {
+    planMessage.value = 'CPA mục tiêu phải là số từ 0 đến 4'
+    return
+  }
+
+  const {totalPoint, totalCredits} = gradedStats.value
+  const remaining = remainingCourses.value
+  const remainCredits = remaining.reduce((s, c) => s + c.credit, 0)
+  if (!remainCredits) {
+    planMessage.value = 'Không còn môn nào cần học'
+    return
+  }
+
+  const allCredits = totalCredits + remainCredits
+  const maxCPA = (totalPoint + 4 * remainCredits) / allCredits
+  if (target > maxCPA + 1e-9) {
+    planMessage.value = `Không khả thi. CPA tối đa có thể đạt: ${maxCPA.toFixed(2)}`
+    return
+  }
+
+  const needTotal = target * allCredits - totalPoint
+  const need = needTotal / remainCredits
+
+  let base = 0
+  LETTER_SCALE.forEach((l, i) => {
+    if (l.point <= need) base = i
+  })
+
+  const levels = remaining.map(c => ({course: c, idx: base}))
+  let sum = levels.reduce((s, l) => s + LETTER_SCALE[l.idx].point * l.course.credit, 0)
+
+  const order = [...levels].sort((a, b) => b.course.credit - a.course.credit)
+  for (const l of order) {
+    if (sum >= needTotal - 1e-9) break
+    if (l.idx >= LETTER_SCALE.length - 1) continue
+    l.idx++
+    sum += 0.5 * l.course.credit
+  }
+
+  targetScores.value = levels.map(l => ({
+    code: l.course.code,
+    credit: l.course.credit,
+    target: `${LETTER_SCALE[l.idx].letter} (≥ ${LETTER_SCALE[l.idx].min})`,
+  }))
+
+  const achieved = (totalPoint + sum) / allCredits
+  planMessage.value = `CPA đạt được theo kế hoạch: ${achieved.toFixed(2)} (tối đa: ${maxCPA.toFixed(2)})`
+}
 
 const getRegistrationData = async () => {
-  try {
-    const res = await fetch(`${import.meta.env.BASE_URL}data.json`)
-    hustRegistrationData.value = await res.json()
-  } catch (e) {
-    // Fallback data tĩnh nếu không có file data.json
-  }
+  const res = await fetch(`${import.meta.env.BASE_URL}data.json`)
+  hustRegistrationData.value = await res.json()
+  mapSubject.value = new Map(hustRegistrationData.value.map(item => [item.code, item]))
 }
 
 onMounted(getRegistrationData)
@@ -550,6 +651,17 @@ onMounted(getRegistrationData)
   color: #7b0e11;
   border-bottom: 2px solid #7b0e11;
   background: #fff;
+}
+
+.hust-logo {
+  width: 55px;
+  height: 65px;
+}
+
+.plan-message {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: #7b0e11;
 }
 
 @media (max-width: 1100px) {
