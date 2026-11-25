@@ -18,6 +18,24 @@
     "letter_score":"B"
   },
   {
+    "code":"TT6000",
+    "name":"Thực tập tốt nghiệp",
+    "credits":"6",
+    "process_point":"9",
+    "exam_point":"8.5",
+    "final_score":"8.70",
+    "letter_score":"A"
+  },
+  {
+    "code":"IT5419",
+    "name":"Tích hợp hệ thống thông tin",
+    "credits":"3",
+    "process_point":"8.50",
+    "exam_point":"8.5",
+    "final_score":"8.50",
+    "letter_score":"A"
+  },
+  {
     "code":"IT6390",
     "name":"Web ngữ nghĩa",
     "credits":"3",
